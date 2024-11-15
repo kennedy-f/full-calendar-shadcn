@@ -45,6 +45,7 @@ function Example() {
     <div className="w-full md:w-[1280px]">
       <FullCalendarProvider
         events={EventsMock}
+        onClickEvent={(event) => console.log(event)}
         handleClickAddEvent={(selectedDay) => setEvents([...events, {
             title: 'test',
             date: { start:selectedDay, end: selectedDay},

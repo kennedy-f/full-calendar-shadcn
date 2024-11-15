@@ -16,6 +16,7 @@ export function App() {
         <div className="w-full md:w-[1280px]">
           <FullCalendarProvider
             events={EventsMock}
+            onClickEvent={() => null}
             handleClickAddEvent={() => null}
           >
             <FullCalendarHeader />

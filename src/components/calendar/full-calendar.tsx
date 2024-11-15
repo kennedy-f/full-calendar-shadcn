@@ -67,6 +67,7 @@ interface CalendarContextProps {
   selectedDate: Date;
   selectDate: (date: Date) => void;
   events: FullCalendarEvent[];
+  onClickEvent: (event: FullCalendarEvent) => void;
   addEvent: (day: Date) => void;
   monthStart: Date;
 }
@@ -77,12 +78,14 @@ interface FullCalendarProviderProps {
   children: ReactElement[];
   events: FullCalendarEvent[];
   handleClickAddEvent: (selectedDay: Date) => void;
+  onClickEvent: (event: FullCalendarEvent) => void;
 }
 
 export function FullCalendarProvider({
   children,
   events: _events,
   handleClickAddEvent,
+  onClickEvent,
 }: FullCalendarProviderProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -109,6 +112,7 @@ export function FullCalendarProvider({
         selectedDate,
         addEvent: handleClickAdd,
         monthStart: startOfMonth(currentMonth),
+        onClickEvent,
       }}
     >
       <div className={"w-full"}>{children}</div>
@@ -245,6 +249,7 @@ interface EventChipProps {
 
 const EventChip = forwardRef<HTMLButtonElement, EventChipProps>(
   function EventChip({ event, day }, ref) {
+    const { onClickEvent } = useCalendar();
     const eventStartOnThisDay = isSameDay(event.date.start, day);
     const eventEndsOnThisDay = isSameDay(event.date.end, day);
 
@@ -266,6 +271,7 @@ const EventChip = forwardRef<HTMLButtonElement, EventChipProps>(
             <button
               className={`button z-10 p-0 ${eventContinuityClasses} ${bgColor} rounded overflow-hidden flex flex-col`}
               ref={ref}
+              onClick={() => onClickEvent(event)}
             >
               <div className={"flex flex-row"}>
                 <div className={"flex flex-col"}>
