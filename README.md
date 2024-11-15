@@ -1,50 +1,67 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+# Full calendar ShadCn
+The FullCalendar component provides a grid-based monthly calendar view that displays events and allows users to navigate between months, select dates, and add events. It includes a tooltip feature to show detailed event information on hover, as well as customizable event colors.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Key Features
+- Monthly Navigation: Easily move between months using header controls.
+- Event Display with Tooltips: Show events in calendar cells with tooltips displaying additional information, including titles, dates, participants, and pricing (if available).
+- Color Customization: Customize event colors using Tailwind color classes for the event background.
+- Dynamic Event Spanning: Events spanning multiple days are displayed without borders disrupting continuity.
+- Selectable Dates: Highlights the selected date and today’s date for easy reference.
+- Add Event Button: Easily add new events to any day using the button in each cell.
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
+### Event props
+```typescript
+interface FullCalendarEvent {
+  title: string;
+  details?: string;
+  person?: [
+    {
+      name: string;
+      role: string;
     },
-  },
-})
+  ];
+  date: { start: Date; end: Date };
+  price?: {
+    value: number;
+    currency: string;
+  };
+  colors: {
+    background: Color;
+  };
+}
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Usage example
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+```tsx
+import {EventsMock} from "src/events.mock";
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+function Example() {
+  const [events, setEvents] = useState(EventsMock)
+  return (
+    <div className="w-full md:w-[1280px]">
+      <FullCalendarProvider
+        events={EventsMock}
+        handleClickAddEvent={(selectedDay) => setEvents([...events, {
+            title: 'test',
+            date: { start:selectedDay, end: selectedDay},
+            colors: { background: 'blue-500'},
+            details: 'example'
+          }]
+        )}
+      >
+        <FullCalendarHeader/>
+        <FullCalendarHeaderDays/>
+        <FullCalendarDaysCells/>
+      </FullCalendarProvider>
+    </div>
+  );
+}
 ```
+
+
+![img.png](img.png)
+![img_1.png](img_1.png)

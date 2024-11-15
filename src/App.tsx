@@ -14,16 +14,14 @@ export function App() {
       <div className={"flex-col gap-2"}>
         <ModeToggle />
         <div className="w-full md:w-[1280px]">
-          <div className="w-full md:w-[1280px]">
-            <FullCalendarProvider
-              events={EventsMock}
-              handleClickAddEvent={() => null}
-            >
-              <FullCalendarHeader />
-              <FullCalendarHeaderDays />
-              <FullCalendarDaysCells />
-            </FullCalendarProvider>
-          </div>
+          <FullCalendarProvider
+            events={EventsMock}
+            handleClickAddEvent={() => null}
+          >
+            <FullCalendarHeader />
+            <FullCalendarHeaderDays />
+            <FullCalendarDaysCells />
+          </FullCalendarProvider>
         </div>
       </div>
     </ThemeProvider>
