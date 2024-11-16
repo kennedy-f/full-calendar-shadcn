@@ -5,6 +5,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
+import { cn } from "@/lib/utils.ts";
 import {
   addDays,
   addMonths,
@@ -20,6 +21,7 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -40,7 +42,10 @@ type A = "inherit" | "current" | "transparent" | "black" | "white";
 
 type B = keyof Omit<typeof TWColors, A>;
 
-type Color = `${B}-${keyof (typeof TWColors)[B]}` | `${A}`;
+// type Color = `${B}-${keyof (typeof TWColors)[B]}` | `${A}`;
+type BackgroundColor = `bg-${B}-${keyof (typeof TWColors)[B]}` | `${A}`;
+
+export type FullCalendarColor = BackgroundColor;
 
 export interface FullCalendarEvent {
   title: string;
@@ -57,7 +62,7 @@ export interface FullCalendarEvent {
     currency: string;
   };
   colors: {
-    background: Color;
+    background: BackgroundColor;
   };
 }
 
@@ -134,7 +139,7 @@ export function FullCalendarHeader() {
         <ChevronLeftIcon />
       </div>
       <div>
-        <span>{format(currentMonth, dateFormat)}</span>
+        <span>{format(currentMonth, dateFormat, { locale: ptBR })}</span>
       </div>
       <div
         className="cursor-pointer"
@@ -148,7 +153,7 @@ export function FullCalendarHeader() {
 
 export function FullCalendarHeaderDays() {
   const { currentMonth } = useCalendar();
-  const dateFormat = "EE";
+  const dateFormat = "EEEE";
   const startDate = startOfWeek(currentMonth);
 
   const days = useMemo(() => {
@@ -156,7 +161,7 @@ export function FullCalendarHeaderDays() {
     for (let i = 0; i < 7; i++) {
       elements.push(
         <div className="flex-1 text-center" key={i}>
-          {format(addDays(startDate, i), dateFormat)}
+          {format(addDays(startDate, i), dateFormat, { locale: ptBR })}
         </div>,
       );
     }
@@ -223,11 +228,11 @@ function EventTooltipData({ event }: { event: FullCalendarEvent }) {
 
       <p>
         <span className={"font-semibold"}>Inicio:</span>{" "}
-        {format(event.date.start, "dd/MM/yyyy HH:mm")}
+        {format(event.date.start, "dd/MM/yyyy HH:mm", { locale: ptBR })}
       </p>
       <p className={"pb-2"}>
         <span className={"font-semibold"}>Fim:</span>{" "}
-        {format(event.date.end, "dd/MM/yyyy HH:mm")}{" "}
+        {format(event.date.end, "dd/MM/yyyy HH:mm", { locale: ptBR })}{" "}
       </p>
       {event.price && (
         <p>
@@ -262,14 +267,16 @@ const EventChip = forwardRef<HTMLButtonElement, EventChipProps>(
       isLastDayOfWeek && !eventEndsOnThisDay ? "border-r mr-0" : ""
     }`;
 
-    const bgColor = `bg-${event.colors.background}`;
+    const bgColor = `${event.colors.background}`;
 
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              className={`button z-10 p-0 ${eventContinuityClasses} ${bgColor} rounded overflow-hidden flex flex-col`}
+              className={cn(
+                `button z-10 p-0 ${eventContinuityClasses} ${bgColor} rounded overflow-hidden flex flex-col`,
+              )}
               ref={ref}
               onClick={() => onClickEvent(event)}
             >
@@ -332,11 +339,11 @@ const DayCell = memo(
             isSameDay(event.date.start, day) ||
             (!isAfter(event.date.start, day) && !isBefore(event.date.end, day)),
         )
-        .sort((sortEvent) => {
-          return isSameDay(sortEvent.date.end, day) &&
-            isSameDay(sortEvent.date.start, day)
-            ? 0
-            : -1;
+        .sort((a, b) => {
+          if (isSameDay(a.date.start, b.date.start)) {
+            return 0;
+          }
+          return isBefore(a.date.start, b.date.start) ? -1 : 1;
         });
     }, [events]);
 
@@ -346,7 +353,7 @@ const DayCell = memo(
 
     return (
       <div
-        className={`flex flex-col min-h-[180px] min-w-[137px] text-center align-center ${!isSameMonth(day, monthStart) && "text-gray-400"} border`}
+        className={`flex flex-col md:min-h-[180px] md:min-w-[137px] text-center align-center ${!isSameMonth(day, monthStart) && "text-gray-400"} border`}
         key={day.toString()}
       >
         <div className={"flex w-max flex-row justify-end p-1"}>
@@ -354,7 +361,9 @@ const DayCell = memo(
             className={`flex  justify-center items-center cursor-pointer w-7 h-7  ${isSameDay(day, new Date()) ? "bg-red-500 text-white rounded-full " : ""}`}
             onClick={() => selectDate(day)}
           >
-            <label className={`cursor-pointer `}>{format(day, "d")}</label>
+            <label className={`cursor-pointer `}>
+              {format(day, "d", { locale: ptBR })}
+            </label>
           </div>
         </div>
         <EventsCell events={dayEvents} day={day} />
